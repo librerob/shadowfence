@@ -34,6 +34,7 @@ async function screenshot(name) {
   await page.screenshot({
     path: join(screenshots, name + ".png"),
     fullPage: true,
+    animations: "disabled",
   });
 }
 async function visible(text) {

@@ -196,7 +196,6 @@ select,
 input,
 textarea {
   transition:
-    background var(--duration),
     border-color var(--duration),
     box-shadow var(--duration);
 }

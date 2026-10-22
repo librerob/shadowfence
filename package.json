@@ -13,7 +13,7 @@
     "lint": "eslint src tests scripts",
     "format": "prettier --write src tests scripts *.json *.ts *.html",
     "test": "vitest run",
-    "build": "vite build && node scripts/validate-package.mjs",
+    "build": "node scripts/notices.mjs && vite build && node scripts/validate-package.mjs",
     "test:browser": "node tests/browser.mjs",
     "package": "node scripts/package.mjs",
     "check": "npm run typecheck && npm run lint && npm test && npm run build"

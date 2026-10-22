@@ -33,6 +33,27 @@ of the same person are outside the detection goal; one same-person negative pair
 which is not enough to establish a general false-positive rate. Screenshots are simulated by adding borders, not a complete OS capture.
 Browser decoder/resampler differences may affect perceptual fingerprints near a threshold.
 
+## Measured regression results
+
+The [Chromium 156 CI run](https://github.com/librerob/shadowfence/actions/runs/39869038368)
+tested the production worker with the documented thresholds:
+
+| Change | Detected | Missed |
+| --- | --- | --- |
+| Resize to 160px wide | 6 of 6 | 0 |
+| JPEG quality 35 | 6 of 6 | 0 |
+| Brightness +12% | 6 of 6 | 0 |
+| Saturation 0.7, hue +12 degrees | 6 of 6 | 0 |
+| WebP quality 70 | 6 of 6 | 0 |
+| Central 80% crop | 0 of 6 | 6 |
+| 90-degree rotation | 0 of 6 | 6 |
+| Screenshot-like border | 0 of 6 | 6 |
+
+There were no warnings across 21 distinct-original pairs, including the same-person negative
+pair. Worker startup, decoding and fingerprinting took 10–152 ms per image on that CI runner
+(mean 25.7 ms across 55 inputs). These measurements describe this corpus and machine only.
+Exact duplicate and renamed-file checks passed through the installed extension UI.
+
 ## Unsupported guarantees
 
 Cropping, rotations, mirroring, screenshots, overlays, heavy color editing and adversarial changes

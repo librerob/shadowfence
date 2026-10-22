@@ -270,7 +270,9 @@ export function Identities({
               <span>
                 <strong>{i.name}</strong>
                 <small>
-                  {i.images.length} images · {i.identifiers.length} identifiers
+                  {i.images.length} {i.images.length === 1 ? "image" : "images"}{" "}
+                  · {i.identifiers.length}{" "}
+                  {i.identifiers.length === 1 ? "identifier" : "identifiers"}
                 </small>
               </span>
               <Icon name="arrow" size={16} />
