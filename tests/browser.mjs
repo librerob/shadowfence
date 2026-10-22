@@ -506,7 +506,7 @@ try {
   await go("Identities");
   await visible("@my_personal_handle");
   results.browserRestartPersistence = true;
-  await page.getByRole("button", { name: /Anonymous.*images/ }).click();
+  await page.getByRole("button", { name: /Anonymous.*image/ }).click();
   await page
     .getByRole("button", { name: "Remove image 1", exact: true })
     .click();
