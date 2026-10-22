@@ -47,6 +47,15 @@ async function unlock(secret = passphrase) {
 }
 async function go(name) {
   await page.getByRole("link", { name, exact: true }).click();
+  const route = {
+    Overview: "overview",
+    Identities: "identities",
+    "Check image": "image",
+    "Check text": "text",
+    Settings: "settings",
+    About: "about",
+  }[name];
+  await page.locator(`main.page-${route}`).waitFor();
 }
 async function createIdentity(name, color = "violet") {
   const button = page.getByRole("button", {
