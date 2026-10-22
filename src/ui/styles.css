@@ -1694,3 +1694,38 @@ dialog p {
     border-style: solid;
   }
 }
+
+.dropzone.compact {
+  min-height: 88px;
+  padding: 20px 24px;
+  flex-direction: row;
+  gap: 16px;
+  text-align: left;
+}
+.dropzone.compact .drop-icon {
+  margin: 0;
+}
+.dropzone.compact h2 {
+  font-size: 15px;
+  margin: 0;
+}
+.dropzone.compact p,
+.dropzone.compact .caption {
+  display: none;
+}
+.dropzone.compact button {
+  margin-left: auto;
+}
+@media (max-width: 470px) {
+  .dropzone.compact {
+    padding: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dropzone.compact h2 {
+    display: none;
+  }
+  .dropzone.compact button {
+    padding: 10px 16px;
+  }
+}

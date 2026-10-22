@@ -114,11 +114,13 @@ export function FileDrop({
   onFiles,
   busy,
   multiple = false,
+  compact = false,
   label = "Choose an image",
 }: {
   onFiles: (files: File[]) => void;
   busy: boolean;
   multiple?: boolean;
+  compact?: boolean;
   label?: string;
 }) {
   const input = useRef<HTMLInputElement>(null),
@@ -126,7 +128,7 @@ export function FileDrop({
   return (
     <div
       ref={area}
-      className="dropzone"
+      className={`dropzone${compact ? " compact" : ""}`}
       onDragOver={(e) => {
         e.preventDefault();
         if (!busy) area.current?.classList.add("dragging");
@@ -145,7 +147,11 @@ export function FileDrop({
         <Icon name="image" size={32} />
       </span>
       <h2>
-        {multiple ? "Add images to this identity" : "Check before you share"}
+        {multiple
+          ? "Add images to this identity"
+          : compact
+            ? "Check another image"
+            : "Check before you share"}
       </h2>
       <p>
         Drop {multiple ? "images" : "an image"} here, or choose{" "}

@@ -43,6 +43,8 @@ export function App() {
   }, [vault.status]);
   useEffect(() => {
     document.title = `${navigation.find((i) => i.id === page)?.label ?? "ShadowFence"} · ShadowFence`;
+    window.scrollTo(0, 0);
+    document.getElementById("main")?.focus({ preventScroll: true });
   }, [page]);
   if (vault.status !== "open") return <Unlock vault={vault} />;
   const selected = vault.data.identities.find(
@@ -61,7 +63,14 @@ export function App() {
   };
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main">
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("main")?.focus();
+        }}
+      >
         Skip to content
       </a>
       <aside className="sidebar">

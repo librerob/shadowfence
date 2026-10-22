@@ -164,13 +164,11 @@ try {
     .setInputFiles("tests/fixtures/coffee.png");
   await visible("No cross-identity matches detected.");
   await screenshot("no-match");
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "broken.jpg",
-      mimeType: "image/jpeg",
-      buffer: Buffer.from("not an image"),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "broken.jpg",
+    mimeType: "image/jpeg",
+    buffer: Buffer.from("not an image"),
+  });
   await page.getByRole("alert").waitFor();
   await screenshot("invalid-image");
   await page
@@ -432,13 +430,11 @@ try {
   try {
     const restorePage = await restoreContext.newPage();
     await restorePage.goto(`chrome-extension://${id}/app.html`);
-    await restorePage
-      .locator("input[type=file]")
-      .setInputFiles({
-        name: "backup.json",
-        mimeType: "application/json",
-        buffer: Buffer.from(JSON.stringify(backup)),
-      });
+    await restorePage.locator("input[type=file]").setInputFiles({
+      name: "backup.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(backup)),
+    });
     await restorePage
       .getByLabel("Passphrase", { exact: true })
       .fill(passphrase);

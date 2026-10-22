@@ -77,6 +77,7 @@ export function CheckImage({ vault }: { vault: Vault }) {
       <FileDrop
         onFiles={(files) => void check(files)}
         busy={busy || vault.busy}
+        compact={!!fp}
       />
       {busy && (
         <div className="progress" role="status">
