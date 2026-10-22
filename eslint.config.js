@@ -23,6 +23,7 @@ export default tseslint.config(
         Blob: "readonly",
         atob: "readonly",
         fetch: "readonly",
+          window: "readonly",
       },
     },
   },

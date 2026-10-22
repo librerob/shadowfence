@@ -12,8 +12,8 @@ const screenshots = resolve("test-results/screenshots");
 await mkdir(screenshots, { recursive: true });
 const errors = [],
   network = [];
-const launch = () =>
-  chromium.launchPersistentContext(profile, {
+const launch = async () => {
+  const c = await chromium.launchPersistentContext(profile, {
     channel: "chromium",
     headless: true,
     viewport: { width: 1280, height: 900 },
@@ -22,11 +22,15 @@ const launch = () =>
       `--load-extension=${extension}`,
     ],
   });
+  await c.setOffline(true);
+  return c;
+};
 let context = await launch();
 let page;
 const passphrase = "test vault passphrase only";
 const savedPassphrase = "updated test passphrase only";
 async function screenshot(name) {
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: join(screenshots, name + ".png"),
     fullPage: true,
@@ -113,9 +117,7 @@ try {
   await screenshot("identity-dialog");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("dialog").waitFor({ state: "hidden" });
-  await page
-    .getByLabel("Image label", { exact: false })
-    .fill("Garden reference");
+  await page.getByLabel("Image label", { exact: false }).fill("Profile photo");
   await page
     .locator("input[type=file]")
     .setInputFiles("tests/fixtures/chelsea.png");
@@ -158,13 +160,11 @@ try {
     .setInputFiles("tests/fixtures/chelsea.png");
   await visible("Identity collision detected");
   await screenshot("exact-match");
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "renamed-photo.png",
-      mimeType: "image/png",
-      buffer: await readFile("tests/fixtures/chelsea.png"),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "renamed-photo.png",
+    mimeType: "image/png",
+    buffer: await readFile("tests/fixtures/chelsea.png"),
+  });
   await visible("Identity collision detected");
   await page
     .getByRole("button", { name: "Register intentional reuse" })
@@ -213,11 +213,76 @@ try {
     await go("Overview");
     await screenshot("overview-" + theme.toLowerCase());
     await go("Settings");
+    const themedPopup = await context.newPage();
+    await themedPopup.setViewportSize({ width: 360, height: 540 });
+    await themedPopup.goto(`chrome-extension://${id}/popup.html`);
+    await themedPopup.screenshot({
+      path: join(screenshots, "popup-" + theme.toLowerCase() + ".png"),
+    });
+    await themedPopup.close();
   }
   const black = await page.evaluate(
     () => getComputedStyle(document.documentElement).backgroundColor,
   );
   assert.equal(black, "rgb(0, 0, 0)");
+  let minContrast = Infinity,
+    contrastChecks = 0;
+  for (const theme of ["Light", "Dark", "AMOLED"]) {
+    await page.getByRole("button", { name: theme, exact: true }).click();
+    for (const accent of [
+      "Violet",
+      "Blue",
+      "Teal",
+      "Green",
+      "Rose",
+      "Neutral",
+    ]) {
+      await page.getByRole("button", { name: accent, exact: true }).click();
+      const ratios = await page.evaluate(() => {
+        const style = getComputedStyle(document.documentElement);
+        const luminance = (name) => {
+          let value = style.getPropertyValue(name).trim().slice(1);
+          if (value.length === 3)
+            value = value
+              .split("")
+              .map((x) => x + x)
+              .join("");
+          const rgb = [0, 2, 4]
+            .map((i) => parseInt(value.slice(i, i + 2), 16) / 255)
+            .map((v) =>
+              v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4,
+            );
+          return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+        };
+        return [
+          ["--on-surface", "--background"],
+          ["--on-surface-variant", "--surface"],
+          ["--on-primary", "--primary"],
+          ["--on-primary-container", "--primary-container"],
+          ["--error", "--error-container"],
+          ["--success", "--success-container"],
+          ["--warning", "--warning-container"],
+        ].map(([fg, bg]) => {
+          const a = luminance(fg),
+            b = luminance(bg);
+          return {
+            fg,
+            bg,
+            ratio: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05),
+          };
+        });
+      });
+      for (const pair of ratios) {
+        assert.ok(
+          pair.ratio >= 4.5,
+          `${theme}/${accent} ${pair.fg} on ${pair.bg}: ${pair.ratio}`,
+        );
+        minContrast = Math.min(minContrast, pair.ratio);
+        contrastChecks++;
+      }
+    }
+  }
+  results.contrast = { checks: contrastChecks, minRatio: minContrast };
   await page.getByRole("button", { name: "Teal", exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export backup" }).click();
@@ -466,6 +531,7 @@ try {
   );
   try {
     const restorePage = await restoreContext.newPage();
+    await restorePage.clock.install();
     await restorePage.goto(`chrome-extension://${id}/app.html`);
     await restorePage.locator("input[type=file]").setInputFiles({
       name: "backup.json",
@@ -482,6 +548,11 @@ try {
       .getByRole("navigation", { name: "Main navigation" })
       .waitFor();
     results.restore = true;
+    await restorePage.clock.fastForward(301000);
+    await restorePage
+      .getByRole("heading", { name: "Welcome back", exact: true })
+      .waitFor();
+    results.idleLock = true;
   } finally {
     await restoreContext.close();
   }
