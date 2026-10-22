@@ -13,6 +13,8 @@ const sources = {
     "c2dd0de7c538df8d111e479619b129464d0269d0ae5fd18ca91d33a7fdfea95c",
   "hubble_deep_field.jpg":
     "3a19c5dd8a927a9334bb1229a6d63711b1c0c767fb27e2286e7c84a3e2c2f5f4",
+  "collins-flight.jpg":
+    "294434d55c19f00bfe4c078da58a93c908bc3df20e6925daff7c71830986e667",
 };
 await mkdir("tests/fixtures", { recursive: true });
 for (const [name, hash] of Object.entries(sources)) {
@@ -22,8 +24,10 @@ for (const [name, hash] of Object.entries(sources)) {
     bytes = await readFile(path);
   } catch {
     const response = await fetch(
-      "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/" +
-        name,
+      name === "collins-flight.jpg"
+        ? "https://www.nasa.gov/wp-content/uploads/2024/07/sts093-309-027orig.jpg"
+        : "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/" +
+            name,
     );
     if (!response.ok) throw Error(`Fixture download failed: ${name}`);
     bytes = Buffer.from(await response.arrayBuffer());
@@ -33,5 +37,5 @@ for (const [name, hash] of Object.entries(sources)) {
   await writeFile(path, bytes);
 }
 console.log(
-  "Verified six test photographs. These downloads are development-only.",
+  "Verified seven test photographs. These downloads are development-only.",
 );

@@ -404,6 +404,7 @@ export function Identities({
                 Identifier
                 <input
                   aria-label="Identifier"
+                  disabled={vault.busy || !!progress}
                   placeholder="e.g. name@example.com or @handle"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}

@@ -128,8 +128,10 @@ try {
     .getByLabel("Identifier", { exact: true })
     .fill("personal@example.com");
   await page.getByRole("button", { name: "Add", exact: true }).click();
+  await visible("personal@example.com");
   await page.getByLabel("Identifier", { exact: true }).fill("@personal_handle");
   await page.getByRole("button", { name: "Add", exact: true }).click();
+  await visible("@personal_handle");
   await page
     .getByRole("button", { name: "Edit @personal_handle", exact: true })
     .click();
@@ -139,6 +141,12 @@ try {
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await visible("@my_personal_handle");
   await screenshot("identities");
+  await go("Check image");
+  await page
+    .locator("input[type=file]")
+    .setInputFiles("tests/fixtures/chelsea.png");
+  await visible("No cross-identity matches detected.");
+  await go("Identities");
   await createIdentity("Anonymous");
   await page
     .getByRole("combobox", { name: "Current identity" })
@@ -150,6 +158,14 @@ try {
     .setInputFiles("tests/fixtures/chelsea.png");
   await visible("Identity collision detected");
   await screenshot("exact-match");
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({
+      name: "renamed-photo.png",
+      mimeType: "image/png",
+      buffer: await readFile("tests/fixtures/chelsea.png"),
+    });
+  await visible("Identity collision detected");
   await page
     .getByRole("button", { name: "Register intentional reuse" })
     .click();
@@ -276,6 +292,10 @@ try {
   const cases = JSON.parse(
     await readFile("test-results/image-cases.json", "utf8"),
   );
+  cases.push({
+    name: "collins-flight.jpg",
+    paths: { original: "tests/fixtures/collins-flight.jpg" },
+  });
   const hashes = [],
     timings = [];
   for (const item of cases) {
@@ -337,10 +357,12 @@ try {
     (x) => x !== "original",
   ))
     summary[variant] = {
-      detected: hashes.filter((x) =>
-        same(x.fingerprints.original, x.fingerprints[variant]),
+      detected: hashes.filter(
+        (x) =>
+          x.fingerprints[variant] &&
+          same(x.fingerprints.original, x.fingerprints[variant]),
       ).length,
-      total: hashes.length,
+      total: hashes.filter((x) => x.fingerprints[variant]).length,
     };
   let unrelated = 0,
     falsePositives = 0;
@@ -356,6 +378,14 @@ try {
     thresholds: { pHash: 8, dHash: 10, minDetail: 8 },
     summary,
     unrelated: { falsePositives, total: unrelated },
+    samePersonDifferentPhoto: {
+      matched: same(
+        hashes[0].fingerprints.original,
+        hashes.at(-1).fingerprints.original,
+      ),
+      subject: "Eileen Collins; NASA portrait vs STS-93 flight photo",
+      pairs: 1,
+    },
     timingMs: {
       min: Math.min(...timings),
       max: Math.max(...timings),
@@ -374,6 +404,11 @@ try {
     "All recompression fixtures detected",
   );
   assert.equal(falsePositives, 0, "Unrelated original pairs are not matched");
+  assert.equal(
+    imageReport.samePersonDifferentPhoto.matched,
+    false,
+    "Different photographs of the same person do not match",
+  );
   results.imageEvaluation = imageReport.summary;
   // Explicit locking propagates to other extension tabs.
   const second = await context.newPage();
@@ -400,7 +435,9 @@ try {
   await page
     .getByRole("button", { name: "Remove image 1", exact: true })
     .click();
-  await visible("Registered images");
+  await page
+    .getByRole("heading", { name: "Registered images 0", exact: true })
+    .waitFor();
   await page
     .getByRole("button", { name: "Delete identity", exact: true })
     .click();

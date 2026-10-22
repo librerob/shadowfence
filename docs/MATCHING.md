@@ -23,14 +23,14 @@ production worker in an installed extension. It saves each fingerprint, distance
 those fingerprints, processing times, and detection counts to `test-results/image-evaluation.json`.
 
 The browser suite requires all six resize and all six JPEG-recompression pairs to match. It checks
-all 15 pairs of unrelated originals and requires zero warnings. Harder transformations are reported
+all 21 pairs of distinct originals (including a second NASA photo of Eileen Collins) and requires zero warnings. Harder transformations are reported
 without treating their incidental detection as a supported capability. Byte-identical registration,
 same-identity handling, intentional reuse and invalid files are exercised through the actual UI.
 
 This is a small engineering regression set, not a representative benchmark. Thresholds need a
 larger independent photographic corpus before any broad reliability claim. Different photographs
-of the same person are not detected intentionally; a dedicated same-person negative dataset has
-not yet been evaluated. Screenshots are simulated by adding borders, not a complete OS capture.
+of the same person are outside the detection goal; one same-person negative pair is included,
+which is not enough to establish a general false-positive rate. Screenshots are simulated by adding borders, not a complete OS capture.
 Browser decoder/resampler differences may affect perceptual fingerprints near a threshold.
 
 ## Unsupported guarantees
