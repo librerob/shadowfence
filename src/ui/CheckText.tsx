@@ -1,3 +1,4 @@
+import { privateText } from "./privateInput";
 import { useState } from "react";
 import { textMatches } from "../core/matching";
 import type { Vault } from "./useVault";
@@ -34,6 +35,7 @@ export function CheckText({ vault }: { vault: Vault }) {
         <label>
           Text to check
           <textarea
+            {...privateText}
             className="text-check"
             rows={9}
             value={text}

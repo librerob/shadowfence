@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Disable spellcheck, autocorrection and form autocomplete on sensitive text fields.
+- Lock after one minute hidden and check expiration on resume and before interaction.
+- Start inactivity timing at successful unlock or restore.
+
 ## 0.1.0
 
 - Add encrypted local identities, image registrations and identifier management.

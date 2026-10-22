@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ShadowFence",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Check for image reuse and identifying text across your identities. Local, encrypted, and offline.",
   "minimum_chrome_version": "120",
   "action": { "default_popup": "popup.html", "default_title": "ShadowFence" },

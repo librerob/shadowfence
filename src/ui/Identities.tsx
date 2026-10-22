@@ -1,3 +1,4 @@
+import { privateText } from "./privateInput";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   identityColors,
@@ -74,6 +75,7 @@ export function IdentityForm({
         <label>
           Name
           <input
+            {...privateText}
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -85,6 +87,7 @@ export function IdentityForm({
         <label>
           Description <span className="caption">Optional</span>
           <textarea
+            {...privateText}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={240}
@@ -329,6 +332,7 @@ export function Identities({
               Image label{" "}
               <span className="caption">Optional, applies to this batch</span>
               <input
+                {...privateText}
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 maxLength={120}
@@ -405,6 +409,7 @@ export function Identities({
               <label>
                 Identifier
                 <input
+                  {...privateText}
                   aria-label="Identifier"
                   disabled={vault.busy || !!progress}
                   placeholder="e.g. name@example.com or @handle"

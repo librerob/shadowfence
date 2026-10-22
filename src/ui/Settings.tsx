@@ -1,3 +1,4 @@
+import { privateText } from "./privateInput";
 import { useState, type FormEvent } from "react";
 import { identityColors } from "../core/model";
 import type { Vault } from "./useVault";
@@ -158,6 +159,7 @@ export function Settings({ vault }: { vault: Vault }) {
           <label>
             New passphrase
             <input
+              {...privateText}
               type="password"
               autoComplete="new-password"
               minLength={12}
@@ -170,6 +172,7 @@ export function Settings({ vault }: { vault: Vault }) {
           <label>
             Confirm new passphrase
             <input
+              {...privateText}
               type="password"
               autoComplete="new-password"
               minLength={12}

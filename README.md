@@ -71,7 +71,8 @@ with AES-256-GCM. PBKDF2-SHA-256 derives a non-extractable key from your passphr
 600,000 iterations and a random salt. Each save uses a fresh nonce.
 
 Keys and decrypted records stay in the open workspace tab. Closing or reloading it locks that
-session; five minutes without interaction also locks it. Explicit locking locks other open
+session; five minutes without interaction or one minute hidden also locks it. Expired sessions
+lock on return before accepting new interaction, even if background timers were suspended. Explicit locking locks other open
 workspaces. Each tab must be unlocked separately. The popup opens a workspace without reading
 your identities. Appearance preferences are stored unencrypted.
 

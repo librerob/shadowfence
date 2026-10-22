@@ -40,6 +40,28 @@ async function screenshot(name) {
 async function visible(text) {
   await page.getByText(text, { exact: true }).waitFor({ timeout: 15000 });
 }
+async function privateFields(target = page) {
+  const fields = await target
+    .locator('textarea, input:not([type="file"])')
+    .evaluateAll((elements) =>
+      elements.map((el) => ({
+        spellcheck: el.spellcheck,
+        autocomplete: el.autocomplete,
+        autocorrect: el.getAttribute("autocorrect"),
+        autocapitalize: el.getAttribute("autocapitalize"),
+        password: el.type === "password",
+      })),
+    );
+  assert.ok(fields.length);
+  for (const field of fields) {
+    assert.equal(field.spellcheck, false);
+    assert.equal(field.autocorrect, "off");
+    assert.equal(field.autocapitalize, "off");
+    if (field.password)
+      assert.match(field.autocomplete, /^(new|current)-password$/);
+    else assert.equal(field.autocomplete, "off");
+  }
+}
 async function unlock(secret = passphrase) {
   await page.getByLabel("Passphrase", { exact: true }).fill(secret);
   await page.getByRole("button", { name: "Unlock vault", exact: true }).click();
@@ -109,6 +131,7 @@ try {
   await page.goto(`chrome-extension://${id}/app.html`);
   await page.getByLabel("Passphrase", { exact: true }).fill(passphrase);
   await page.getByLabel("Confirm passphrase", { exact: true }).fill(passphrase);
+  await privateFields();
   await screenshot("welcome");
   await page.getByRole("button", { name: "Create encrypted vault" }).click();
   await page
@@ -125,8 +148,10 @@ try {
     .getByLabel("Description", { exact: false })
     .fill("Family, friends and everyday life");
   await screenshot("identity-dialog");
+  await privateFields();
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("dialog").waitFor({ state: "hidden" });
+  await privateFields();
   await page.getByLabel("Image label", { exact: false }).fill("Profile photo");
   await page
     .locator("input[type=file]")
@@ -563,6 +588,64 @@ try {
       .getByRole("heading", { name: "Welcome back", exact: true })
       .waitFor();
     results.idleLock = true;
+    // Changing system time does not fire timers: the first trusted input must
+    // expire the session before it can refresh activity or reach a text field.
+    await restorePage
+      .getByLabel("Passphrase", { exact: true })
+      .fill(passphrase);
+    await restorePage
+      .getByRole("button", { name: "Unlock vault", exact: true })
+      .click();
+    await restorePage
+      .getByRole("navigation", { name: "Main navigation" })
+      .waitFor();
+    await restorePage
+      .getByRole("link", { name: "Check text", exact: true })
+      .click();
+    await privateFields(restorePage);
+    await restorePage.getByLabel("Text to check", { exact: true }).focus();
+    await restorePage.clock.setSystemTime(
+      new Date((await restorePage.evaluate(() => Date.now())) + 301000),
+    );
+    await restorePage.keyboard.type("sensitive");
+    await restorePage
+      .getByRole("heading", { name: "Welcome back", exact: true })
+      .waitFor();
+    results.expiredInputBlockedWithoutTimer = true;
+    await restorePage
+      .getByLabel("Passphrase", { exact: true })
+      .fill(passphrase);
+    await restorePage
+      .getByRole("button", { name: "Unlock vault", exact: true })
+      .click();
+    await restorePage
+      .getByRole("navigation", { name: "Main navigation" })
+      .waitFor();
+    // Simulate visibility transitions explicitly; headless pages do not reliably
+    // become hidden when another tab is foregrounded.
+    await restorePage.evaluate(() => {
+      Object.defineProperty(document, "hidden", {
+        configurable: true,
+        value: true,
+      });
+      document.dispatchEvent(new window.Event("visibilitychange"));
+    });
+    await restorePage.clock.setSystemTime(
+      new Date((await restorePage.evaluate(() => Date.now())) + 61000),
+    );
+    await restorePage.evaluate(() => {
+      Object.defineProperty(document, "hidden", {
+        configurable: true,
+        value: false,
+      });
+      document.dispatchEvent(new window.Event("visibilitychange"));
+      delete document.hidden;
+    });
+    await restorePage
+      .getByRole("heading", { name: "Welcome back", exact: true })
+      .waitFor();
+    results.simulatedHiddenResumeLockWithoutTimer = true;
+    results.privateInputAttributes = true;
   } finally {
     await restoreContext.close();
   }

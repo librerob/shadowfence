@@ -10,6 +10,7 @@ import {
 } from "../core/crypto";
 import { emptyVault, validateData, type VaultData } from "../core/model";
 import { readEnvelope, writeEnvelope } from "../core/storage";
+import { Inactivity } from "../core/inactivity";
 
 export function useVault() {
   const [status, setStatus] = useState<
@@ -24,6 +25,7 @@ export function useVault() {
     data: VaultData;
   } | null>(null);
   const channel = useRef<BroadcastChannel | null>(null);
+  const inactivity = useRef(new Inactivity());
   const epoch = useRef(0),
     working = useRef(false);
   const lockRef = useRef<() => void>(() => {});
@@ -53,15 +55,28 @@ export function useVault() {
     bc.onmessage = () => {
       if (alive) lock(false);
     };
-    let last = Date.now();
-    const activity = (e: Event) => {
-      if (e.isTrusted) last = Date.now();
+    const expire = () => {
+      if (!session.current || !inactivity.current.expired(Date.now()))
+        return false;
+      lockRef.current();
+      return true;
     };
-    window.addEventListener("pointerdown", activity);
-    window.addEventListener("keydown", activity);
-    const timer = setInterval(() => {
-      if (session.current && Date.now() - last > 300000) lockRef.current();
-    }, 1000);
+    const activity = (e: Event) => {
+      if (!e.isTrusted || !session.current) return;
+      if (expire()) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      } else inactivity.current.activity(Date.now());
+    };
+    window.addEventListener("pointerdown", activity, true);
+    window.addEventListener("keydown", activity, true);
+    const visibility = () => {
+      // Test the previous hidden interval before clearing it on return.
+      if (!expire()) inactivity.current.visibility(Date.now(), document.hidden);
+    };
+    document.addEventListener("visibilitychange", visibility);
+    window.addEventListener("focus", expire);
+    const timer = setInterval(expire, 1000);
     const onPageHide = () => lock(false);
     window.addEventListener("pagehide", onPageHide);
     return () => {
@@ -70,12 +85,18 @@ export function useVault() {
       session.current = null;
       bc.close();
       clearInterval(timer);
-      window.removeEventListener("pointerdown", activity);
-      window.removeEventListener("keydown", activity);
+      window.removeEventListener("pointerdown", activity, true);
+      window.removeEventListener("keydown", activity, true);
+      document.removeEventListener("visibilitychange", visibility);
+      window.removeEventListener("focus", expire);
       window.removeEventListener("pagehide", onPageHide);
     };
   }, []);
   async function task<T>(fn: (token: number) => Promise<T>): Promise<T> {
+    if (session.current && inactivity.current.expired(Date.now())) {
+      lock();
+      throw new Error("Your session expired. Unlock your vault to continue.");
+    }
     if (working.current)
       throw new Error("Please wait for the current change to finish.");
     working.current = true;
@@ -111,6 +132,7 @@ export function useVault() {
       if (!existing) await writeEnvelope(envelope, null);
       ensure(token);
       session.current = { key, envelope, data: value };
+      inactivity.current.reset(Date.now(), document.hidden);
       setData(value);
       setStatus("open");
     });
@@ -150,6 +172,7 @@ export function useVault() {
       await writeEnvelope(envelope, null);
       ensure(token);
       session.current = { key, envelope, data: value };
+      inactivity.current.reset(Date.now(), document.hidden);
       setData(value);
       setStatus("open");
       channel.current?.postMessage("changed");
@@ -175,7 +198,13 @@ export function useVault() {
     restore,
     changePassphrase,
     erase,
-    backup: () => session.current?.envelope ?? null,
+    backup: () => {
+      if (session.current && inactivity.current.expired(Date.now())) {
+        lock();
+        return null;
+      }
+      return session.current?.envelope ?? null;
+    },
   };
 }
 export type Vault = ReturnType<typeof useVault>;

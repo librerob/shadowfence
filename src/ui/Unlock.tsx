@@ -1,3 +1,4 @@
+import { privateText } from "./privateInput";
 import { useState, type FormEvent } from "react";
 import type { Vault } from "./useVault";
 import { Brand, Icon } from "./Icon";
@@ -83,6 +84,7 @@ export function Unlock({ vault }: { vault: Vault }) {
               <label>
                 Passphrase
                 <input
+                  {...privateText}
                   autoFocus
                   type="password"
                   autoComplete={setup ? "new-password" : "current-password"}
@@ -97,6 +99,7 @@ export function Unlock({ vault }: { vault: Vault }) {
                 <label>
                   Confirm passphrase
                   <input
+                    {...privateText}
                     type="password"
                     autoComplete="new-password"
                     value={confirm}
@@ -121,7 +124,7 @@ export function Unlock({ vault }: { vault: Vault }) {
               <p className="caption">
                 {setup && !backup
                   ? "Use at least 12 characters. There is no passphrase recovery."
-                  : "The vault locks after 5 minutes without interaction, or when this tab closes."}
+                  : "Locks after 5 minutes idle, 1 minute hidden, or when this tab closes."}
               </p>
             </form>
           )}

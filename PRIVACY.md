@@ -18,7 +18,8 @@ access. Backups contain the same encrypted envelope.
 An open tab necessarily holds decrypted records and a non-extractable CryptoKey in memory.
 Locking drops application references and clears the rendered workspace; JavaScript cannot promise
 secure physical memory erasure. No keys are saved in session storage or a background service worker.
-Tabs lock independently when closed or idle, and explicit locking broadcasts to open tabs. A save
+Tabs lock after five minutes idle or one minute hidden, and when closed. Expiration is also checked
+on return and before accepting new activity. Locking broadcasts to open tabs. A save
 in another tab invalidates older sessions so they cannot silently overwrite it.
 
 Uninstalling the extension removes its local database. Settings can delete the vault. Downloaded
@@ -29,3 +30,7 @@ There are no site permissions, content scripts, upload interception, external me
 web-accessible extension resources. Your browser still needs its ordinary network access to install
 updates or visit websites. Development tools download dependencies and test browsers; those are
 not part of normal extension operation.
+
+Sensitive text fields disable browser spellcheck, autocorrection, capitalization and form
+autocomplete. Password fields retain password-manager hints. These controls do not govern OS
+keyboards, input methods or software with access to your device.
