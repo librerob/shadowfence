@@ -169,13 +169,25 @@ try {
       exact: true,
     })
     .waitFor();
+  const textMatch = await page
+    .locator(".text-results .match-row")
+    .boundingBox();
+  assert.ok(
+    textMatch && textMatch.y + textMatch.height <= 784,
+    "Text warning and match fit in the screenshot",
+  );
   await shot("02-text-check-dark.png");
   await go("Identities");
   await shot("03-identities-dark.png");
   await go("Settings");
   await page
     .getByRole("heading", { name: "Vault security", exact: true })
-    .scrollIntoViewIfNeeded();
+    .evaluate((heading) =>
+      window.scrollTo(
+        0,
+        window.scrollY + heading.getBoundingClientRect().top - 110,
+      ),
+    );
   await shot("04-vault-security-dark.png", true, false);
   const downloading = page.waitForEvent("download");
   await page

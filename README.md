@@ -16,10 +16,12 @@ identities such as Personal, Anonymous, and Work. Processing happens on your dev
 There are no accounts, telemetry, servers, site integrations or browser permissions.
 ShadowFence does not intercept uploads. **Check a file before selecting it on a website.**
 
-![An exact cross-identity image match in the installed extension](docs/screenshots/image-check.png)
+![An exact cross-identity image match in the dark workspace](docs/screenshots/image-check-dark.png)
 
-[Dark popup](docs/screenshots/popup-dark.png) · [AMOLED workspace](docs/screenshots/amoled.png).
-These are screenshots from the production extension running in Chromium, using test identities.
+[Light workspace](docs/screenshots/overview-light.png) · [Dark popup](docs/screenshots/popup-dark.png) · [AMOLED workspace](docs/screenshots/amoled.png).
+The lead screenshot is captured from the production extension in Stable Chrome for Testing,
+using fictional identities. [Chrome Web Store listing materials](store/README.md) are prepared
+separately from the installable package.
 
 ## Installation
 

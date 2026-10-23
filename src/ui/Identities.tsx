@@ -341,6 +341,7 @@ export function Identities({
             </label>
             <FileDrop
               multiple
+              compact={identity.images.length > 0}
               busy={!!progress || vault.busy}
               label="Add images"
               onFiles={(files) => void register(files)}

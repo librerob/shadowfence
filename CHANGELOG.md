@@ -4,6 +4,7 @@
 
 - Show neutral results when other identities have no image or identifier references.
 - Show how many image references were compared.
+- Keep text results and existing image registrations visible with more compact input areas.
 - Add explicit toolbar icons and a padded 128px Chrome Web Store icon.
 - Prepare dark-first Store screenshots, listing text and submission notes.
 - Document migration from unpacked installations and update supported versions.

@@ -43,7 +43,7 @@ export function CheckText({ vault }: { vault: Vault }) {
           <textarea
             {...privateText}
             className="text-check"
-            rows={9}
+            rows={8}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste a message, bio, or post you are about to share…"
