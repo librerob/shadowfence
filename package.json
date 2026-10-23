@@ -1,6 +1,6 @@
 {
   "name": "shadowfence",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-or-later",
@@ -14,11 +14,12 @@
     "format": "prettier --write src tests scripts *.json *.ts *.html",
     "test": "vitest run",
     "build": "node scripts/notices.mjs && vite build && node scripts/validate-package.mjs",
-    "test:browser": "node tests/browser.mjs",
+    "test:browser": "node tests/migration-browser.mjs && node tests/browser.mjs",
     "package": "node scripts/package.mjs",
     "check": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {
+    "@noble/hashes": "2.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

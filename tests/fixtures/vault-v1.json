@@ -1,0 +1,9 @@
+{
+  "format": "shadowfence",
+  "version": 1,
+  "iterations": 600000,
+  "salt": "CwsLCwsLCwsLCwsLCwsLCw==",
+  "iv": "DQ0NDQ0NDQ0NDQ0N",
+  "ciphertext": "VDuSXIme92nKFYucgu7/OARVG9Nlv8IOW7h3BX7CvbVMc3sJ1S3WKkt7CI/RqiIjqvgTJsgIZd5klXetu5SmmDcgSrlMYxzLtsvnxWOVyvU7u1AaQ7Egc/JuOdlYzK4T5iOuxI2SWlBBR4lKKZk5/abSnxoDTVu+1fVzY9yZUu64DFWyjEiVz9AUzNayqL9bARe3Mjca4BqPlc+5eDOBrKI5w18Up7kVAuGv2wcgzGXhdtNcoN91eUujHWX8Xt2TUDsl4gHZOLREQ3DzHBaTIKYVI2a/dVQi7jD0R93kN5/4H5NDTDc1IFVBZy0ZxvMlgt4RdlnUINX2DphmwBVo2hxfn3dcgJq2TBcSDqoYTB9F8fIZeYInhSfyuOl7QBhryog2+KkRIA1hep3zPE4PMfo/gNmroX2LUFH5d4Yd8D6USAP/ca1jmKTGe5yVDjPJgHc04OThOpakDtKx9zQl0xirg8AVqmfU4Zi3A0iKzFUg6XwV9k1C2FZs8sCU4ZSxOHhmiJE4pc1is8VUdv5CR8aOnh+lr3xJGvnYyDZAauF+cRffeOxQbmj4",
+  "revision": "0572beb7-541f-4ed0-8b03-11c74e25f294"
+}

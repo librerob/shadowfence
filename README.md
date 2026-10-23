@@ -67,8 +67,9 @@ They do not detect writing style, semantics, obfuscated identifiers or unregiste
 ## Privacy and limitations
 
 All identity records, labels, identifiers and fingerprints are encrypted together in IndexedDB
-with AES-256-GCM. PBKDF2-SHA-256 derives a non-extractable key from your passphrase using
-600,000 iterations and a random salt. Each save uses a fresh nonce.
+with AES-256-GCM. Argon2id derives a non-extractable key from your passphrase using
+64 MiB, three passes, one lane and a random salt. Derivation runs in a disposable worker;
+normal saves reuse the session key. Each save uses a fresh nonce.
 
 Keys and decrypted records stay in the open workspace tab. Closing or reloading it locks that
 session; five minutes without interaction or one minute hidden also locks it. Expired sessions
@@ -88,6 +89,10 @@ isolate cookies, strip metadata or prevent browser fingerprinting.
 Encryption cannot protect an unlocked session or compromised device, and weak passphrases can
 be guessed offline. Perceptual fingerprints can reveal similarity if obtained in decrypted form.
 See [Privacy](PRIVACY.md) and the [threat model](docs/THREAT-MODEL.md).
+
+Version-1 PBKDF2 vaults and backups remain readable. After successful authentication, an older
+vault upgrades atomically to Argon2id with a fresh salt. New backups need ShadowFence 0.2 or
+later; earlier backup files retain their original protection. See [vault format](docs/VAULT-FORMAT.md).
 
 ## Development
 
@@ -109,7 +114,8 @@ on its first run; the extension itself does not fetch them. `npm run package` ve
 structure and writes it with a checksum to `release`.
 
 Rollup and esbuild use their official WebAssembly packages for a portable build. Runtime
-dependencies are React and React DOM, bundled locally. The UI, tokens, SVG symbols and branding
+dependencies are React, React DOM and the Argon2id implementation from `@noble/hashes`, bundled
+locally. Runtime WebAssembly and broader CSP permissions are not required. The UI, tokens, SVG symbols and branding
 are part of the source. `node scripts/icons.mjs` regenerates PNG icons from the SVG master.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md) and [research notes](docs/RESEARCH.md).

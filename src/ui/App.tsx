@@ -278,8 +278,8 @@ export function App() {
                 <p>
                   Identity records, identifiers, image labels and fingerprints
                   are encrypted with AES-256-GCM. A key is derived from your
-                  passphrase with PBKDF2-SHA-256 (600,000 iterations). Originals
-                  and checked text are never stored. Appearance settings are
+                  passphrase with Argon2id (64 MiB, 3 passes). Originals and
+                  checked text are never stored. Appearance settings are
                   unencrypted.
                 </p>
                 <p>

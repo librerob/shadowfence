@@ -38,6 +38,7 @@ const assets = await readdir("dist/assets");
 await access("dist/LICENSE.txt");
 await access("dist/THIRD-PARTY-NOTICES.txt");
 assert.ok(assets.some((x) => x.startsWith("worker-") && x.endsWith(".js")));
+assert.ok(assets.some((x) => x.startsWith("key-worker-") && x.endsWith(".js")));
 console.log(
   "Package validated: MV3, local assets, image worker, zero permissions, no runtime connections.",
 );

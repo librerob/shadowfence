@@ -1,12 +1,23 @@
 {
   "manifest_version": 3,
   "name": "ShadowFence",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Check for image reuse and identifying text across your identities. Local, encrypted, and offline.",
   "minimum_chrome_version": "120",
-  "action": { "default_popup": "popup.html", "default_title": "ShadowFence" },
-  "options_ui": { "page": "app.html", "open_in_tab": true },
-  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ShadowFence"
+  },
+  "options_ui": {
+    "page": "app.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
   "content_security_policy": {
     "extension_pages": "default-src 'self'; script-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' blob: data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
   }

@@ -3,7 +3,6 @@ import {
   checkPassphrase,
   deriveKey,
   newSalt,
-  open,
   seal,
   validateEnvelope,
   type Envelope,
@@ -11,6 +10,8 @@ import {
 import { emptyVault, validateData, type VaultData } from "../core/model";
 import { readEnvelope, writeEnvelope } from "../core/storage";
 import { Inactivity } from "../core/inactivity";
+import { unlockRecord } from "../core/unlock";
+import { currentKdf } from "../kdf/policy";
 
 export function useVault() {
   const [status, setStatus] = useState<
@@ -26,11 +27,13 @@ export function useVault() {
   } | null>(null);
   const channel = useRef<BroadcastChannel | null>(null);
   const inactivity = useRef(new Inactivity());
+  const operation = useRef<AbortController | null>(null);
   const epoch = useRef(0),
     working = useRef(false);
   const lockRef = useRef<() => void>(() => {});
   const lock = (broadcast = true) => {
     epoch.current++;
+    operation.current?.abort();
     session.current = null;
     setData(emptyVault());
     setError("");
@@ -82,6 +85,7 @@ export function useVault() {
     return () => {
       alive = false;
       epoch.current++;
+      operation.current?.abort();
       session.current = null;
       bc.close();
       clearInterval(timer);
@@ -103,9 +107,11 @@ export function useVault() {
     setBusy(true);
     setError("");
     const token = epoch.current;
+    operation.current = new AbortController();
     try {
       return await fn(token);
     } finally {
+      operation.current = null;
       working.current = false;
       setBusy(false);
     }
@@ -124,12 +130,17 @@ export function useVault() {
       if (create) checkPassphrase(passphrase);
       if (!create && !existing)
         throw new Error("No vault exists. Reload this page to create one.");
-      const salt = existing?.salt ?? newSalt();
-      const key = await deriveKey(passphrase, salt);
-      const value = existing ? await open(existing, key) : emptyVault();
-      const envelope = existing ?? (await seal(value, key, salt));
+      const {
+        key,
+        envelope,
+        data: value,
+        changed,
+      } = await unlockRecord(passphrase, existing, operation.current?.signal);
       ensure(token);
-      if (!existing) await writeEnvelope(envelope, null);
+      if (changed) {
+        await writeEnvelope(envelope, existing?.revision ?? null);
+        channel.current?.postMessage("changed");
+      }
       ensure(token);
       session.current = { key, envelope, data: value };
       inactivity.current.reset(Date.now(), document.hidden);
@@ -141,7 +152,12 @@ export function useVault() {
       const current = session.current;
       if (!current) throw new Error("Unlock your vault first.");
       const next = validateData(transform(structuredClone(current.data)));
-      const envelope = await seal(next, current.key, current.envelope.salt);
+      const envelope = await seal(
+        next,
+        current.key,
+        current.envelope.salt,
+        currentKdf,
+      );
       ensure(token);
       await writeEnvelope(envelope, current.envelope.revision);
       ensure(token);
@@ -155,8 +171,13 @@ export function useVault() {
       if (!current) throw new Error("Unlock your vault first.");
       checkPassphrase(passphrase);
       const salt = newSalt(),
-        key = await deriveKey(passphrase, salt),
-        envelope = await seal(current.data, key, salt);
+        key = await deriveKey(
+          passphrase,
+          salt,
+          currentKdf,
+          operation.current?.signal,
+        ),
+        envelope = await seal(current.data, key, salt, currentKdf);
       ensure(token);
       await writeEnvelope(envelope, current.envelope.revision);
       ensure(token);
@@ -165,9 +186,15 @@ export function useVault() {
     });
   const restore = (input: unknown, passphrase: string) =>
     task(async (token) => {
-      const envelope = validateEnvelope(input),
-        key = await deriveKey(passphrase, envelope.salt),
-        value = await open(envelope, key);
+      const {
+        key,
+        envelope,
+        data: value,
+      } = await unlockRecord(
+        passphrase,
+        validateEnvelope(input),
+        operation.current?.signal,
+      );
       ensure(token);
       await writeEnvelope(envelope, null);
       ensure(token);

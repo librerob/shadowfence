@@ -146,14 +146,19 @@ export function Settings({ vault }: { vault: Vault }) {
       <section className="settings-section">
         <h2>Vault security</h2>
         <p>
-          Your vault locks after 5 minutes without interaction and when this tab
-          closes. Every tab must be unlocked separately. Locking here locks all
-          open ShadowFence tabs.
+          Your vault locks after 5 minutes without interaction, 1 minute hidden,
+          and when this tab closes. Every tab must be unlocked separately.
+          Locking here locks all open ShadowFence tabs.
         </p>
         <button className="tonal" onClick={() => vault.lock()}>
           <Icon name="lock" />
           Lock vault now
         </button>
+        <p className="caption">
+          Older vaults upgrade to Argon2id when unlocked. New backups require
+          ShadowFence 0.2 or later. Previous backups keep their original
+          encryption.
+        </p>
         <h3 className="subheading">Change passphrase</h3>
         <form onSubmit={(e) => void changePass(e)} className="passphrase-form">
           <label>

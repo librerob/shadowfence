@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 const notices = [];
-for (const name of ["react", "react-dom", "scheduler"]) {
+for (const name of ["react", "react-dom", "scheduler", "@noble/hashes"]) {
   const pkg = JSON.parse(
     await readFile(`node_modules/${name}/package.json`, "utf8"),
   );

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+- Derive new vault keys with Argon2id: 64 MiB, three passes, one lane.
+- Upgrade authenticated version-1 vaults and restores atomically with a fresh salt.
+- Bind version-2 headers to AES-GCM and reject unsupported KDF profiles before work.
+- Run derivation in a disposable, cancellable worker with no CSP expansion.
+- Add RFC and independent known-answer checks plus migration and cancellation browser tests.
+
+New backups require version 0.2 or later. Earlier backups remain readable and retain their original
+encryption.
+
 ## 0.1.1
 
 - Disable spellcheck, autocorrection and form autocomplete on sensitive text fields.
