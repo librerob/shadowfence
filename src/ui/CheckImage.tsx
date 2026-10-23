@@ -28,6 +28,11 @@ export function CheckImage({ vault }: { vault: Vault }) {
     ? imageMatches(fp, vault.data.identities, selected.id)
     : [];
   const exact = matches.some((m) => m.kind === "exact");
+  const referenceCount = vault.data.identities.reduce(
+    (count, identity) =>
+      count + (identity.id === selected.id ? 0 : identity.images.length),
+    0,
+  );
   const registered = fp && selected.images.some((i) => i.sha256 === fp.sha256);
   async function check(files: File[]) {
     const file = files[0];
@@ -107,21 +112,33 @@ export function CheckImage({ vault }: { vault: Vault }) {
             </button>
           </div>
           <Notice
-            tone={exact ? "error" : matches.length ? "warning" : "success"}
+            tone={
+              !referenceCount
+                ? "info"
+                : exact
+                  ? "error"
+                  : matches.length
+                    ? "warning"
+                    : "success"
+            }
           >
             <h2>
-              {exact
-                ? "Identity collision detected"
-                : matches.length
-                  ? "Possible identity collision"
-                  : "No cross-identity matches detected."}
+              {!referenceCount
+                ? "No reference images to compare"
+                : exact
+                  ? "Identity collision detected"
+                  : matches.length
+                    ? "Possible identity collision"
+                    : "No cross-identity matches detected."}
             </h2>
             <p>
-              {exact
-                ? "This exact file is registered under another identity. Sharing it here could link the two."
-                : matches.length
-                  ? "This image resembles material registered under another identity. Review the match before sharing."
-                  : "No match was found in your registered images. This does not guarantee anonymity."}
+              {!referenceCount
+                ? "Add reference images under another identity to check for cross-identity reuse. Images registered only under your current identity are excluded."
+                : exact
+                  ? "This exact file is registered under another identity. Sharing it here could link the two."
+                  : matches.length
+                    ? "This image resembles material registered under another identity. Review the match before sharing."
+                    : "No match was found in your registered images. This does not guarantee anonymity."}
             </p>
           </Notice>
           {matches.map((m) => (
@@ -146,12 +163,10 @@ export function CheckImage({ vault }: { vault: Vault }) {
               reported; perceptual matching would be unreliable.
             </Notice>
           )}
-          {vault.data.identities.every(
-            (i) => i.id === selected.id || !i.images.length,
-          ) && (
-            <p className="muted">
-              No images are registered under other identities yet. Add reference
-              images to make this check useful.
+          {!!referenceCount && (
+            <p className="caption">
+              Compared against {referenceCount} registered image
+              {referenceCount === 1 ? "" : "s"} under other identities.
             </p>
           )}
           {registered ? (

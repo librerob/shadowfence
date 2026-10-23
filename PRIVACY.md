@@ -10,6 +10,10 @@ fingerprints, identifiers, and the selected identity. Those records are encrypte
 IndexedDB. Original images, filenames, checked text and previews are not persisted. No data is
 written to Chrome sync or `chrome.storage`. No browser permissions are requested.
 
+Your passphrase is used locally to derive the encryption key. It is not saved or transmitted.
+Names, email addresses, handles and any personal communications you choose to paste are handled
+only for these explicit local checks and registrations. No browsing activity is read.
+
 Only the encrypted envelope's format, KDF parameters, random salt/nonce, ciphertext length and
 revision are visible while locked. Appearance settings are unencrypted in localStorage. The
 database's existence, approximate size and write times can be observable to someone with device
@@ -19,7 +23,8 @@ An open tab necessarily holds decrypted records and a non-extractable CryptoKey 
 Locking drops application references and clears the rendered workspace; JavaScript cannot promise
 secure physical memory erasure. No keys are saved in session storage or a background service worker.
 Tabs lock after five minutes idle or one minute hidden, and when closed. Expiration is also checked
-on return and before accepting new activity. Locking broadcasts to open tabs. A save
+on return and before accepting new activity. Explicit and timeout locks broadcast to open tabs;
+closing a tab discards that tab's session. A save
 in another tab invalidates older sessions so they cannot silently overwrite it.
 
 Uninstalling the extension removes its local database. Settings can delete the vault. Downloaded

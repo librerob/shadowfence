@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1
+
+- Show neutral results when other identities have no image or identifier references.
+- Show how many image references were compared.
+- Add explicit toolbar icons and a padded 128px Chrome Web Store icon.
+- Prepare dark-first Store screenshots, listing text and submission notes.
+- Document migration from unpacked installations and update supported versions.
+
 ## 0.2.0
 
 - Derive new vault keys with Argon2id: 64 MiB, three passes, one lane.

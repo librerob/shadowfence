@@ -13,6 +13,12 @@ export function CheckText({ vault }: { vault: Vault }) {
       ? textMatches(text, vault.data.identities, vault.data.currentId)
       : [];
   const checkedNow = checked === text;
+  const referenceCount = vault.data.identities.reduce(
+    (count, identity) =>
+      count +
+      (identity.id === vault.data.currentId ? 0 : identity.identifiers.length),
+    0,
+  );
   return (
     <>
       <div className="page-title">
@@ -69,16 +75,24 @@ export function CheckText({ vault }: { vault: Vault }) {
       </form>
       {checkedNow && (
         <section className="text-results" aria-live="polite">
-          <Notice tone={matches.length ? "error" : "success"}>
+          <Notice
+            tone={
+              !referenceCount ? "info" : matches.length ? "error" : "success"
+            }
+          >
             <h2>
-              {matches.length
-                ? "Cross-identity identifiers detected"
-                : "No cross-identity identifiers detected."}
+              {!referenceCount
+                ? "No reference identifiers to compare"
+                : matches.length
+                  ? "Cross-identity identifiers detected"
+                  : "No cross-identity identifiers detected."}
             </h2>
             <p>
-              {matches.length
-                ? "Review these identifiers before posting. They are registered under your other identities."
-                : "No registered identifiers were found. Writing style, context and unregistered details can still identify you."}
+              {!referenceCount
+                ? "Add identifiers under another identity to check for cross-identity disclosures. Identifiers registered only under your current identity are excluded."
+                : matches.length
+                  ? "Review these identifiers before posting. They are registered under your other identities."
+                  : "No registered identifiers were found. Writing style, context and unregistered details can still identify you."}
             </p>
           </Notice>
           {matches.map((m) => (

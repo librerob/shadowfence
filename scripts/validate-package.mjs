@@ -1,6 +1,7 @@
 import { readFile, access, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
+import sharp from "sharp";
 const manifest = JSON.parse(await readFile("dist/manifest.json", "utf8"));
 assert.equal(manifest.manifest_version, 3);
 assert.equal(
@@ -24,10 +25,33 @@ for (const file of [
   manifest.action.default_popup,
   manifest.options_ui.page,
   ...Object.values(manifest.icons),
+  ...Object.values(manifest.action.default_icon),
   "icons/icon.svg",
   "appearance.js",
 ])
   await access(join("dist", file));
+for (const [size, file] of Object.entries({
+  ...manifest.icons,
+  ...manifest.action.default_icon,
+})) {
+  const meta = await sharp(join("dist", file)).metadata();
+  assert.equal(meta.format, "png");
+  assert.equal(meta.width, Number(size));
+  assert.equal(meta.height, Number(size));
+}
+const storeIcon = await sharp("dist/icons/128.png")
+  .ensureAlpha()
+  .raw()
+  .toBuffer();
+for (let y = 0; y < 128; y++)
+  for (let x = 0; x < 128; x++) {
+    if (x < 16 || x >= 112 || y < 16 || y >= 112)
+      assert.equal(
+        storeIcon[(y * 128 + x) * 4 + 3],
+        0,
+        "Store icon has transparent 16px padding",
+      );
+  }
 for (const page of ["app.html", "popup.html"]) {
   const html = await readFile(join("dist", page), "utf8");
   for (const [, file] of html.matchAll(/(?:src|href)="\.\/([^"#]+)"/g))

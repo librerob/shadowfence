@@ -182,7 +182,16 @@ try {
   await page
     .locator("input[type=file]")
     .setInputFiles("tests/fixtures/chelsea.png");
-  await visible("No cross-identity matches detected.");
+  await visible("No reference images to compare");
+  assert.equal(await page.locator(".result .notice.success").count(), 0);
+  await screenshot("no-image-references");
+  await go("Check text");
+  await page.getByLabel("Text to check").fill("personal@example.com");
+  await page.getByRole("button", { name: "Check text", exact: true }).click();
+  await visible("No reference identifiers to compare");
+  assert.equal(await page.locator(".text-results .notice.success").count(), 0);
+  await screenshot("no-identifier-references");
+  results.emptyReferenceChecksNeutral = true;
   await go("Identities");
   await createIdentity("Anonymous");
   await page
@@ -239,6 +248,10 @@ try {
   await page.getByRole("button", { name: "Check text", exact: true }).click();
   await visible("Cross-identity identifiers detected");
   await screenshot("text-match");
+  await page.getByLabel("Text to check").fill("An unrelated example sentence.");
+  await page.getByRole("button", { name: "Check text", exact: true }).click();
+  await visible("No cross-identity identifiers detected.");
+  assert.equal(await page.locator(".text-results .notice.success").count(), 1);
   await go("Overview");
   await screenshot("overview-light");
   await go("Settings");

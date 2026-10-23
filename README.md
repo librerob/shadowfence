@@ -35,6 +35,14 @@ If a release is not available, build from source below and load the `dist` folde
 Moving or deleting the loaded folder breaks an unpacked installation. Uninstalling the extension
 removes its local vault; export an encrypted backup before reinstalling.
 
+## Moving between installations
+
+Export an encrypted backup before uninstalling, changing the unpacked folder, or moving to a
+Chrome Web Store installation. Different extension IDs have separate local storage. Restore the
+backup into the new installation with the passphrase used when it was exported, then verify your
+identities and references before removing the old installation. Never uninstall your only copy
+before exporting a backup.
+
 ## Usage
 
 Create a vault with a long, unique passphrase. There is no passphrase recovery.

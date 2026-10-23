@@ -8,5 +8,5 @@ if available. If private reporting is unavailable, open an issue asking for a pr
 without including exploit details, personal identifiers, photographs, passphrases or vault files.
 Do not publish real sensitive data to demonstrate a bug. A minimal synthetic reproduction is useful.
 
-Version 0.1.x is the initial supported line. There is no promised response time or independent
+Version 0.2.x is the current supported line. Update to the latest patch release. There is no promised response time or independent
 security audit. Dependency advisories are checked in CI; this is not a substitute for review.
