@@ -25,7 +25,7 @@ These are screenshots from the production extension running in Chromium, using t
 
 Chrome 120 or newer is required. The extension has not been submitted to the Chrome Web Store.
 
-1. Download `shadowfence-0.1.0.zip` from [Releases](https://github.com/librerob/shadowfence/releases).
+1. Download the installable extension ZIP from [Releases](https://github.com/librerob/shadowfence/releases).
 2. Extract the ZIP to a folder you intend to keep. `manifest.json` must be directly inside it.
 3. Open `chrome://extensions` and turn on **Developer mode**.
 4. Choose **Load unpacked** and select that extracted folder.

@@ -163,7 +163,7 @@ export function Unlock({ vault }: { vault: Vault }) {
         </section>
       </main>
       <footer className="unlock-footer">
-        ShadowFence 0.1.0{" "}
+        ShadowFence {version}{" "}
         <span>
           Check content before selecting it on a website. ShadowFence does not
           intercept uploads.
@@ -172,3 +172,4 @@ export function Unlock({ vault }: { vault: Vault }) {
     </div>
   );
 }
+import { version } from "../version";

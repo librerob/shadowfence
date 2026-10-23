@@ -46,3 +46,20 @@ limited search. ShadowFence makes no novelty or “world's first” claim.
 Automatic integrations with Reddit/X were deferred: file input changes do not reliably precede
 network upload, and content scripts cannot universally guarantee interception. The initial release
 therefore uses explicit pre-upload checks with no site access.
+
+## Vault hardening review - 23 October 2026
+
+- [Chrome spellcheck](https://support.google.com/chrome/answer/12027911): enhanced spellcheck
+  can send entered text to Google. Sensitive text fields now opt out of browser spellcheck,
+  autocorrection and autocomplete. Password fields keep password-manager purpose hints.
+- [OWASP KDF guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+  prefers memory-hard Argon2id. Version 0.2 uses a fixed 64 MiB, three-pass, one-lane profile,
+  with the original PBKDF2 path only for authenticating older vaults before migration.
+- [noble-hashes implementation](https://github.com/paulmillr/noble-hashes): pinned 2.4.0, pure
+  JavaScript, no transitive runtime dependencies and no CSP expansion. Its published 2022 audit
+  excluded Argon2. We do not describe the Argon2 implementation as independently audited.
+- [RFC 9106 section 5.3](https://www.rfc-editor.org/rfc/rfc9106.html#section-5.3) supplies a
+  known-answer test. Production parameters were also cross-checked with
+  [hash-wasm 4.12.0](https://github.com/Daninet/hash-wasm), used only during development.
+- [Vault format](VAULT-FORMAT.md) records header authentication, resource bounds, migration and
+  compatibility. The dependency lockfile and distributed third-party notices include noble-hashes.

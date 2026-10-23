@@ -247,7 +247,7 @@ export function App() {
             <>
               <div className="page-title">
                 <div>
-                  <span className="eyebrow">ShadowFence 0.1.0</span>
+                  <span className="eyebrow">ShadowFence {version}</span>
                   <h1>A boundary, before you share.</h1>
                   <p>
                     Local checks for accidental links between online identities.
@@ -314,3 +314,4 @@ export function App() {
     </div>
   );
 }
+import { version } from "../version";

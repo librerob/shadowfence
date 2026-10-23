@@ -46,9 +46,10 @@ function Popup() {
           Open workspace
           <Icon name="arrow" size={18} />
         </button>
-        <span>0.1.0</span>
+        <span>{version}</span>
       </footer>
     </main>
   );
 }
 createRoot(document.getElementById("root")!).render(<Popup />);
+import { version } from "./version";
