@@ -172,11 +172,11 @@ try {
   const textMatch = await page
     .locator(".text-results .match-row")
     .boundingBox();
+  await shot("02-text-check-dark.png");
   assert.ok(
     textMatch && textMatch.y + textMatch.height <= 784,
-    "Text warning and match fit in the screenshot",
+    `Text warning and match fit in the screenshot: ${JSON.stringify(textMatch)}`,
   );
-  await shot("02-text-check-dark.png");
   await go("Identities");
   await shot("03-identities-dark.png");
   await go("Settings");
